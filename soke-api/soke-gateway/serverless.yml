@@ -1,0 +1,61 @@
+# Welcome to Serverless!
+# Generated from write_serverless_starter.sh
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+service: soke-gateway # NOTE: update this with your service name
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+# frameworkVersion: "=X.X.X"
+
+# change stage to dev, test, or prod
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  region: us-east-2
+  stage: dev
+  versionFunctions: true
+  profile: ${self:provider.stage}Profile
+  iamRoleStatements:
+    $ref: ./iamRolesStatements.json
+  environment:
+    TABLE_NAME: documents_${self:provider.stage}
+    STAGE_NAME: ${self:provider.stage}
+
+functions:
+
+  # search for list of keywords
+  # /documents/keywords?keywords=a the to
+
+  documents_keywords:
+    handler: handler.documents_keywords
+    description: "documents keyword index to documents."
+    events:
+      - http:
+          method: get
+          path: documents/keywords
+  # get items that make up a document
+  # document/{pk}
+  document_pk:
+    handler: handler.document_pk
+    description: "get a single document using a key value"
+    events:
+      - http:
+          method: get
+          path: document/{pk}
+
+custom:
+    defaultStage: dev
+    profiles:
+      dev: devProfile
+      test: testProfile
+      prod: prodProfile
