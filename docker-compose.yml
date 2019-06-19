@@ -1,0 +1,39 @@
+version: '3'
+# docker-compose up
+services:
+  web:
+    container_name: soke
+    image: wilfongjt/soke
+    build:
+      context: ./website/
+    command: >
+      bash -c "npm install && npm run dev"
+
+    volumes:
+      - ./website:/usr/src
+    ports:
+      - "3000:3000"
+  # dynamodb
+  # jupyter doesn connect to dynamodb
+  #dynamo:
+  #  container_name: dynamodb
+  #  image: amazon/dynamodb-local
+  #  environment:
+  #    - ./Djava.library.path=./DynamoDBLocal_lib
+  #  ports:
+  #    - "8000:8000"
+  #  volumes:
+  #    - ./data:/home/dynamodblocal/data
+  #  working_dir: /home/dynamodblocal
+  #  command: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-dbPath", "./data"]
+
+  # jupyter isnt working ... dosnt connect to dynamo
+  #base-notebook:
+  #  container_name: soke-notebooks
+  #  image: wilfongjt/base-notebook
+  #  build:
+  #    context: ./notebooks/
+  #  volumes:
+  #    - ./notebooks:/home/jovyan/work
+  #  ports:
+  #ß    - "8888:8888"
