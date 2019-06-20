@@ -1,6 +1,6 @@
-# soke
+# soke-web
 
-> My sensational Nuxt.js project
+> My splendid Nuxt.js project
 
 ## Build Setup
 

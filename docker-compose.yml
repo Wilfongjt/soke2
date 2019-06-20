@@ -5,12 +5,12 @@ services:
     container_name: soke
     image: wilfongjt/soke
     build:
-      context: ./website/
+      context: ./soke-web/
     command: >
       bash -c "npm install && npm run dev"
 
     volumes:
-      - ./website:/usr/src
+      - ./soke-web:/usr/src
     ports:
       - "3000:3000"
   # dynamodb
