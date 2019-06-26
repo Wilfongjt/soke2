@@ -1,22 +1,30 @@
 'use strict';
 const AWS = require('aws-sdk');
-const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
-//const promise = await dynamodb.listTables({}).promise();
+const docClient = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
 /* Welcome to Serverless!
  * Generated from write_handler_starter.sh
  * See serverless.yml for configuration
 */
-
 module.exports.documents_keywords = async (event) => {
   // need to remove duplicate words
   let keywords = event.queryStringParameters && event.queryStringParameters.keywords;
   let param = {};
   let data = [] ;
+
+  let headers = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "Content-Type,Accept-Langauge",
+      "Access-Control-Allow-Methods": "OPTIONS,GET"
+  };
+
   if (keywords === undefined) {
     data = {
        "Items": []
      };
-    return { statusCode: 200, body: JSON.stringify({param, data}) };
+    return {
+      statusCode: 200,
+      headers: headers,
+      body: JSON.stringify({param, data}) };
   }
   let vals = keywords.split(" ");
   let param_list = [];
@@ -26,19 +34,20 @@ module.exports.documents_keywords = async (event) => {
     let skv = "%w.1".replace("%w",vals[i]);
 
     param_list.push({
+      TableName: process.env.TABLE_NAME,
       IndexName: "gsi_1",
-      ExpressionAttributeValues: {
-       ":sk1": {
-         S: skv
-       }
-      },
       KeyConditionExpression: "sk = :sk1",
-      TableName: process.env.TABLE_NAME
+      ExpressionAttributeValues: {
+       ":sk1": skv
+      }
     });
   }
 
   if(vals.length === 0){
-    return { statusCode: 200, body: JSON.stringify({ param_list, data }) };
+    return {
+      statusCode: 200,
+      headers: headers,
+      body: JSON.stringify({ param_list, data }) };
   }
 
   // load array with promises
@@ -48,11 +57,15 @@ module.exports.documents_keywords = async (event) => {
     const plst = [];
 
     for(i=0; i < param_list.length; i++){
-      plst.push(dynamodb.query(param_list[i]).promise());
+      plst.push(docClient.query(param_list[i]).promise());
     }
+
     const results = await Promise.all(plst);
 
-    return { statusCode: 200, body: JSON.stringify({results}) };
+    return {
+      statusCode: 200,
+      headers: headers,
+      body: JSON.stringify({results}) };
 
   } catch(error){
     return {statusCode: 400, body: error};
@@ -60,6 +73,9 @@ module.exports.documents_keywords = async (event) => {
 };
 
 module.exports.document_pk = async (event) => {
+  /*
+  returns all items for a document 
+  */
   let msg = 'document';
   let pk = event.pathParameters && event.pathParameters.pk;
 
@@ -72,16 +88,14 @@ module.exports.document_pk = async (event) => {
   }
   var params = {
     ExpressionAttributeValues: {
-     ":v1": {
-       S: "d.1"
-      }
+     ":v1": pk
     },
     KeyConditionExpression: "pk = :v1",
     TableName: process.env.TABLE_NAME
    };
    try {
 
-     const data = await dynamodb.query(params).promise();
+     const data = await docClient.query(params).promise();
 
      return { statusCode: 200, body: JSON.stringify({ params, data }) };
    } catch (error){

@@ -26,7 +26,8 @@
     </form>
     <ul id="search-results">
       <li v-for="item in page.items" :key="item.id">
-        <span>{{ item }}</span>
+        <div>{{ item.value }}</div>
+        <span>&nbsp;</span>
       </li>
     </ul>
   </div>
@@ -35,7 +36,9 @@
 <script>
 import { AWSHandlers } from './mixins/AWSHandlers.js'
 // if (process.env.NODE_ENV !== 'production') require('dotenv').config()
-
+/* eslint-disable no-console */
+// console.log('search: ' + process.env.DEVSITE)
+/* eslint-enable no-console */
 export default {
 
   data() {
@@ -55,11 +58,24 @@ export default {
     awsHandlers: function () {
       return new AWSHandlers(this)
     },
-    awsSoke: function () {
-      return JSON.parse(process.env.AWSSOKE)
+    awsGatewayParameters: function () {
+      return 'keywords=%s'.replace('%s', this.form.words)
     },
-    awsSokeGetURL: function () {
-      return this.awsSoke.get()
+    awsGateway: function () {
+      /*
+      * Returns JSON object holding URLs for webservice {get: "", post: "", ...}
+      */
+      let val = {}
+      try {
+        // get the gateway url
+        val = JSON.parse(process.env.AWSSOKE)
+      } catch (err) {
+        /* eslint-disable no-console */
+        console.log('awsGateway error: ' + err)
+        /* eslint-enable no-console */
+        val = {}
+      }
+      return val
     }
   },
   methods: {
@@ -69,11 +85,24 @@ export default {
     wordMe: function () {
       this.form.words = 'dog '
     },
-    onSubmit: function () {
-      this.awsHandlers.awsGET(this.awsSoke)
+    onSubmit: function () { // submit button
+      // put together url to get items
+      const awsGatewayURLWithParameters = '%s?%p'
+        .replace('%s', this.awsGateway.get)
+        .replace('%p', this.awsGatewayParameters)
+      // clear the list
+      this.page.items = []
+      // make the call
+      this.awsHandlers.awsGET(awsGatewayURLWithParameters)
         .then((response) => {
           if (response.status === 200) {
-            this.addItem(response.data)
+            // this.addItem(response.data)
+            /* eslint-disable no-console */
+            let i = 0
+            for (i = 0; i < response.data.results.length; i++) {
+              this.addItems(response.data.results[i].Items)
+            }
+            /* eslint-enable no-console */
             this.feedBack('Type another!')
           } else {
             this.feedBack('Something unexpected happened!')
@@ -81,14 +110,27 @@ export default {
           }
         })
         .catch((err) => {
-          alert('err: ' + err)
+          /* eslint-disable no-console */
+          console.log('submit error: ' + err)
+          /* eslint-enable no-console */
         })
     },
     addItem: function (item) {
-      // item {'name': ''}
+      // show result item to user
       const id = this.page.items.length + 1
-      this.page.items.push({ id: id, value: item })
+      this.page.items.push({ id: id, value: item.data })
+    },
+    addItems: function (itemArray) {
+      // break down result into managable chunks
+      /* eslint-disable no-console */
+      // console.log('results.results.Items: ' + JSON.stringify(results.results.Items))
+      let i = 0
+      for (i = 0; i < itemArray.length; i++) {
+        this.addItem(itemArray[i])
+      }
+      /* eslint-enable no-console */
     }
+
   }
 }
 </script>
