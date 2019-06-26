@@ -8,9 +8,9 @@ describe('.Env', () => {
     expect(process.env.DEVSITE).not.toBe(undefined)
   })
 
-  test('is AWSSOKE initialied', () => {
+  test('is awsGateway initialied', () => {
 
-    expect(process.env.AWSSOKE).not.toBe(undefined)
+    expect(process.env.awsGateway).not.toBe(undefined)
   })
 
 

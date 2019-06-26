@@ -33,6 +33,13 @@ provider:
 
 functions:
 
+  # keywords:
+  #  handler: handler.keywords
+  #  description: "documents keyword index to documents."
+  #  events:
+  #    - http:
+  #        method: get
+  #        path: keywords
   # search for list of keywords
   # /documents/keywords?keywords=a the to
 
