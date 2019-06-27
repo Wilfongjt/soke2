@@ -13,7 +13,7 @@ search
 * Nuxtjs https://nuxtjs.org/guide/installation 
 * Dotenv https://github.com/nuxt-community/dotenv-module
 * Serverless https://serverless.com
-* Python
+* Jupyter Notebook
 
 # Development
 * I use Atom and Docker for website development
@@ -26,8 +26,10 @@ search
 * [soke-web](soke-web/)
 
 # Serverless
+* [soke-api](soke-api/)
 
-# Database
+# Data
+* [soke-data](soke-data/)
 
 
 
