@@ -17,6 +17,14 @@ search
 * I use Atom with the Serverless pluggin for AWS Gateway and Lambda development
 * I use Python to create dynamodb tables, manipulate documents, and load data
 
+# Website
+
+# Gateway and Lambda
+
+# Database
+
+
+
 # Environment Variables
 ```
 AWSSOKE={"get":"https://<aws-id>.execute-api.us-east-2.amazonaws.com/dev/documents/keywords"}
