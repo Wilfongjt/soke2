@@ -1,6 +1,9 @@
 # soke
 search
 
+# Process
+
+
 # Prerequistes
 * AWS account https://aws.amazon.com 
 
@@ -16,6 +19,8 @@ search
 * I use Atom and Docker for website development
 * I use Atom with the Serverless pluggin for AWS Gateway and Lambda development
 * I use Python to create dynamodb tables, manipulate documents, and load data
+
+
 
 # Website
 
