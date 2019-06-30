@@ -1,0 +1,115 @@
+{
+    "documents": [
+        {
+            "AttributeDefinitions": [
+                {
+                    "AttributeName": "pk",
+                    "AttributeType": "S"
+                },
+                {
+                    "AttributeName": "sk",
+                    "AttributeType": "S"
+                },
+                {
+                    "AttributeName": "data",
+                    "AttributeType": "S"
+                }
+            ],
+            "TableName": "documents",
+            "KeySchema": [
+                {
+                    "AttributeName": "pk",
+                    "KeyType": "HASH"
+                },
+                {
+                    "AttributeName": "sk",
+                    "KeyType": "RANGE"
+                }
+            ],
+            "ProvisionedThroughput": {
+                "ReadCapacityUnits": 5,
+                "WriteCapacityUnits": 5
+            },
+            "GlobalSecondaryIndexes": [
+                {
+                    "IndexName": "gsi_1",
+                    "KeySchema": [
+                        {
+                            "AttributeName": "sk",
+                            "KeyType": "HASH"
+                        },
+                        {
+                            "AttributeName": "data",
+                            "KeyType": "RANGE"
+                        }
+                    ],
+                    "Projection": {
+                        "ProjectionType": "ALL"
+                    },
+                    "ProvisionedThroughput": {
+                        "ReadCapacityUnits": 5,
+                        "WriteCapacityUnits": 5
+                    }
+                }
+            ]
+        }
+    ],
+    "music": [
+        {
+            "TableName": "music",
+            "KeySchema": [
+                {
+                    "AttributeName": "Artist",
+                    "KeyType": "HASH"
+                },
+                {
+                    "AttributeName": "SongTitle",
+                    "KeyType": "RANGE"
+                }
+            ],
+            "AttributeDefinitions": [
+                {
+                    "AttributeName": "Artist",
+                    "AttributeType": "S"
+                },
+                {
+                    "AttributeName": "SongTitle",
+                    "AttributeType": "S"
+                }
+            ],
+            "ProvisionedThroughput": {
+                "ReadCapacityUnits": 1,
+                "WriteCapacityUnits": 1
+            }
+        }
+    ],
+    "movies": [
+        {
+            "TableName": "movies",
+            "KeySchema": [
+                {
+                    "AttributeName": "year",
+                    "KeyType": "HASH"
+                },
+                {
+                    "AttributeName": "title",
+                    "KeyType": "RANGE"
+                }
+            ],
+            "AttributeDefinitions": [
+                {
+                    "AttributeName": "year",
+                    "AttributeType": "S"
+                },
+                {
+                    "AttributeName": "title",
+                    "AttributeType": "S"
+                }
+            ],
+            "ProvisionedThroughput": {
+                "ReadCapacityUnits": 10,
+                "WriteCapacityUnits": 10
+            }
+        }
+    ]
+}
