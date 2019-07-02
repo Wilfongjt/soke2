@@ -1,8 +1,6 @@
 import pkg from './package'
-// require('dotenv').config({ debug: process.env.DEBUG })
-// require('dotenv').config()
 
-console.log('nuxt.config.js')
+if (process.env.NODE_ENV !== 'production') require('dotenv').config()
 
 const routerBase = process.env.DEPLOY_ENV === 'GH_PAGES' ? {
   router: {
@@ -13,11 +11,12 @@ const routerBase = process.env.DEPLOY_ENV === 'GH_PAGES' ? {
 export default {
   ...routerBase,
   mode: 'universal',
-  /*
+
   env: {
-    DEVSITE: 'dev.site'
+    DEVSITE: process.env.DEVSITE,
+    AWSSOKE:process.env.AWSSOKE
   },
-  */
+
   /*
   ** Headers of the page
   */

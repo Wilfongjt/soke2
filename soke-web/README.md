@@ -1,8 +1,22 @@
 # soke-web
+> Soke-web is search tool that provides an example of how to call serverless functions from a nuxtjs website.
 
-> Soke-web provides an example of how to call serverless functions from a nuxtjs website.
+### Features
+* Search for one or more keywords
+* Search looks for keywords across multiple sources
+* Search returns a sentence that contains a keyword
+* Search returns a single sentence per keyword per source
+* Shows source name as a title
+* Shows sentence as a description
+* Shows keyword(s) in bold in the description
 
-## Build Setup
+### Definitions
+* Sentence is a list of space delimited words
+* Sentence is part of an item
+* Keyword is a word for which to search
+* Source refers to the document or website from which the a sentence was acquired
+
+## DEV Build Setup
 
 ``` bash
 # install dependencies
@@ -21,88 +35,40 @@ $ npm run generate
 
 For detailed explanation on how things work, checkout [Nuxt.js docs](https://nuxtjs.org).
 
-# Prerequisites
-* setup aws dynamodb
-* setup aws gateway api 
+## DEV Prerequisites
+* setup aws dynamodb in your aws account
+* setup aws gateway api in your aws account
 
-# Environment Variables
+## DEV Environment Variables
+* Replace <aws-host-name> with your amazon host name from your gateway.
 ```
-AWSSOKE={"get":"https://<aws-id>.execute-api.us-east-2.amazonaws.com/dev/documents/keywords"}
+AWSSOKE={"get":"https://<aws-host-name>.execute-api.us-east-2.amazonaws.com/dev/documents/keywords"}
 ```
 
-# Docker-Compose
-## Build Container
+## Docker-Compose
+### DEV Build Container
+Build when you first download the repo.
+Build when or if you change the docker-compose.yml
+Build when or if you change the Dockerfile
 ```
 cd soke/
-docker-compose build 
+docker-compose build
 ```
 
-## Start Container
+### DEV Start Container
 ```
 cd soke/
 docker-compose up
 ```
 
-## Launch Website
+## DEV Website
+Use Chrome or Firefox
 * http://localhost:3000
 
-# Dynamodb
-```
-{
-    "documents": [
-        {
-            "AttributeDefinitions": [
-                {
-                    "AttributeName": "pk",
-                    "AttributeType": "S"
-                },
-                {
-                    "AttributeName": "sk",
-                    "AttributeType": "S"
-                },
-                {
-                    "AttributeName": "data",
-                    "AttributeType": "S"
-                }
-            ],
-            "TableName": "documents",
-            "KeySchema": [
-                {
-                    "AttributeName": "pk",
-                    "KeyType": "HASH"
-                },
-                {
-                    "AttributeName": "sk",
-                    "KeyType": "RANGE"
-                }
-            ],
-            "ProvisionedThroughput": {
-                "ReadCapacityUnits": 5,
-                "WriteCapacityUnits": 5
-            },
-            "GlobalSecondaryIndexes": [
-                {
-                    "IndexName": "gsi_1",
-                    "KeySchema": [
-                        {
-                            "AttributeName": "sk",
-                            "KeyType": "HASH"
-                        },
-                        {
-                            "AttributeName": "data",
-                            "KeyType": "RANGE"
-                        }
-                    ],
-                    "Projection": {
-                        "ProjectionType": "ALL"
-                    },
-                    "ProvisionedThroughput": {
-                        "ReadCapacityUnits": 5,
-                        "WriteCapacityUnits": 5
-                    }
-                }
-            ]
-        }
-    ]
-}   
-```
+
+## Common Issues
+* Safari
+  * DONT USE SAFARI it has issues with AWS
+  * Preflight response is not successful
+  * XMLHttpRequest cannot load ... due to access control checks
+  * Failed to load resource: Preflight response is not successful

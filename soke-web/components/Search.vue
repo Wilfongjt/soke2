@@ -24,21 +24,24 @@
         </span>
       </p>
     </form>
-    <ul id="search-results">
-      <li v-for="item in page.items" :key="item.id">
-        <div>{{ item.value }}</div>
+    <!--ul id="search-results"-->
+      <div v-for="item in page.items" :key="item.id">
         <span>&nbsp;</span>
-      </li>
-    </ul>
+        <p class="subtitle">
+          {{ item.title }}
+        </p>
+        <p>
+          <span v-html="item.description"></span>
+        </p>
+      </div>
+    <!--/ul-->
   </div>
 </template>
 
 <script>
 import { AWSHandlers } from './mixins/AWSHandlers.js'
 // if (process.env.NODE_ENV !== 'production') require('dotenv').config()
-/* eslint-disable no-console */
-// console.log('search: ' + process.env.DEVSITE)
-/* eslint-enable no-console */
+
 export default {
 
   data() {
@@ -55,6 +58,9 @@ export default {
     }
   },
   computed: {
+    wordList: function () {
+      return this.form.words.split(' ')
+    },
     awsHandlers: function () {
       return new AWSHandlers(this)
     },
@@ -70,20 +76,34 @@ export default {
         // get the gateway url
         val = JSON.parse(process.env.AWSSOKE)
       } catch (err) {
-        /* eslint-disable no-console */
-        console.log('awsGateway error: ' + err)
-        /* eslint-enable no-console */
+        this.log('awsGateway error: ' + err)
         val = {}
       }
       return val
     }
   },
   methods: {
+    log: function (msg) {
+      /* eslint-disable no-console */
+      console.log(msg)
+      /* eslint-enable no-console */
+    },
     feedBack: function (msg) {
       this.page.subtitle = msg
     },
     wordMe: function () {
       this.form.words = 'dog '
+    },
+    highlight: function (description) {
+      let desc = description
+      let i = 0
+      for (i in this.wordList) {
+        desc = desc.replace(
+          this.wordList[i] + ' ',
+          '<strong>%s</strong>'.replace('%s', this.wordList[i] + ' ')
+        )
+      }
+      return desc
     },
     onSubmit: function () { // submit button
       // put together url to get items
@@ -96,13 +116,10 @@ export default {
       this.awsHandlers.awsGET(awsGatewayURLWithParameters)
         .then((response) => {
           if (response.status === 200) {
-            // this.addItem(response.data)
-            /* eslint-disable no-console */
             let i = 0
             for (i = 0; i < response.data.results.length; i++) {
               this.addItems(response.data.results[i].Items)
             }
-            /* eslint-enable no-console */
             this.feedBack('Type another!')
           } else {
             this.feedBack('Something unexpected happened!')
@@ -110,27 +127,26 @@ export default {
           }
         })
         .catch((err) => {
-          /* eslint-disable no-console */
-          console.log('submit error: ' + err)
-          /* eslint-enable no-console */
+          this.log('submit error: ' + err)
         })
     },
     addItem: function (item) {
       // show result item to user
       const id = this.page.items.length + 1
-      this.page.items.push({ id: id, value: item.data })
+      this.page.items.push({
+        id: id,
+        title: item.title,
+        description: this.highlight(item.data)
+      })
     },
     addItems: function (itemArray) {
       // break down result into managable chunks
-      /* eslint-disable no-console */
       // console.log('results.results.Items: ' + JSON.stringify(results.results.Items))
       let i = 0
       for (i = 0; i < itemArray.length; i++) {
         this.addItem(itemArray[i])
       }
-      /* eslint-enable no-console */
     }
-
   }
 }
 </script>
