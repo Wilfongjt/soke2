@@ -12,11 +12,11 @@ class StubDB:
                  aws_access_key_id='anything',\
                  aws_secret_access_key='anything'):
 
-        print('db_name: ', db_name)
-        print('region_name: ', region_name)
-        print('endpoint_url: ', endpoint_url)
-        print('aws_access_key_id: ', aws_access_key_id)
-        print('aws_secret_access_key: ', aws_secret_access_key)
+        # print('db_name: ', db_name)
+        # print('region_name: ', region_name)
+        # print('endpoint_url: ', endpoint_url)
+        # print('aws_access_key_id: ', aws_access_key_id)
+        # print('aws_secret_access_key: ', aws_secret_access_key)
         self.dryrun = True
         self.dbName = db_name
         self.endpoint_url = endpoint_url
@@ -25,8 +25,8 @@ class StubDB:
         self.region_name=region_name #'us-east-2'
 
         # aws dynamodb list-tables --endpoint http://localhost:8000
-        print('todo: add .env aws_access_key_id')
-        print('todo: add .env aws_secret_access_key')
+        # print('todo: add .env aws_access_key_id')
+        # print('todo: add .env aws_secret_access_key')
 
         self.db = None
         self.client = None
@@ -46,21 +46,13 @@ class StubDB:
 
     def connect_remote(self):
 
-        print('dbName: ', self.dbName)
-        # print('endpoint_url: ', self.endpoint_url)
-        print('aws_access_key_id: ', self.aws_access_key_id)
-        print('aws_secret_access_key : ', self.aws_secret_access_key)
-        print('region_name: ', self.region_name)
-
-
         print('remote db connecting...')
         self.db = boto3.resource(self.dbName,
-
                                  aws_access_key_id=self.aws_access_key_id,
                                  aws_secret_access_key=self.aws_secret_access_key,
                                  region_name=self.region_name
                                 )
-        print('self.db: ', self.db)
+        
         print('remote client connecting...')
         self.client = boto3.client(self.dbName,
 
@@ -74,13 +66,6 @@ class StubDB:
         return self
 
     def connect_local(self):
-
-        print('dbName: ', self.dbName)
-        print('endpoint_url: ', self.endpoint_url)
-        print('aws_access_key_id: ', self.aws_access_key_id)
-        print('aws_secret_access_key : ', self.aws_secret_access_key)
-        print('region_name: ', self.region_name)
-
 
         print('local db connecting...')
         self.db = boto3.resource(self.dbName,

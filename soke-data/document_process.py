@@ -19,7 +19,8 @@ class DocumentProcess(DataProcessInterface):
         self.input_folder = util.getInputFolder(table_name_key)
         
         self.doc_no  = 1 # assumeing all docs are read form the begining to the end
-        self.para_no = 1  
+        self.para_no = 1 
+        self.sentance_no = 1
         self.word_no = 1 
         self.wordCounter = WordCounter()
         #self.bufferedWriter = BufferedWriter(self.output_folder,
@@ -102,6 +103,10 @@ class DocumentProcess(DataProcessInterface):
         # self.para_no += increment 
         return 'p.{}'.format(self.para_no)
     
+    def getST_ID(self):
+        # sentance id
+        return 's.{}'.format(self.sentance_no)
+    
     def getPD_ID(self):
         return 'p{}.d{}'.format(self.para_no, self.doc_no)
     
@@ -133,9 +138,20 @@ class DocumentProcess(DataProcessInterface):
     def processSentences(self, paragraph):
         sk_id = self.getDOC_ID()
         para_id = self.getPH_ID()
+        sent_id = self.getST_ID()
         # make list of sentences
         for sentence in self.sentences( paragraph.lower() ).split('. '):
+            item = {'pk': sk_id, 
+                  'sk': sent_id, 
+                  'data':  sentence
+                   }
             # process of a sentence
+            
+            self.sentance_no += 1
+            item = self.typifyItem( item )
+            item = {'PutRequest': {'Item': item}}
+            self.getBufferedWriter().write(item)
+            
             self.processWordToDocument( sentence ) 
             #
             # processUniqueWords( sentences )
