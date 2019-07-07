@@ -60,8 +60,7 @@ class StubDB:
                                    aws_secret_access_key=self.aws_secret_access_key,
                                    region_name=self.region_name
                                   )
-        print('list tables: ',self.client.list_tables())
-
+        
         print('connecting...out')
         return self
 
