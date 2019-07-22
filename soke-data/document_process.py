@@ -138,16 +138,22 @@ class DocumentProcess(DataProcessInterface):
     def processSentences(self, paragraph):
         sk_id = self.getDOC_ID()
         para_id = self.getPH_ID()
-        sent_id = self.getST_ID()
+        
         # make list of sentences
         for sentence in self.sentences( paragraph.lower() ).split('. '):
+            sent_id = self.getST_ID()
+            altsentence = sentence
+            if len(altsentence)==0:
+                altsentence='\n'
+                
             item = {'pk': sk_id, 
                   'sk': sent_id, 
-                  'data':  sentence
+                  'data':  altsentence
                    }
             # process of a sentence
             
             self.sentance_no += 1
+            
             item = self.typifyItem( item )
             item = {'PutRequest': {'Item': item}}
             self.getBufferedWriter().write(item)
@@ -175,14 +181,21 @@ class DocumentProcess(DataProcessInterface):
         uniqueList = set(self.spacifyPuncuation(sentence.lower()).split())
         
         for word in uniqueList:
+            altword = word
+            altsentence=sentence
             
-            w_cnt = self.getWordCounter().add(word)
+            if len(altword) == 0 or altword == '\n' or altword == '':
+                altword= 'BLANK-WORD'
+            if len(altsentence)==0 or altword == '\n':
+                altsentence = 'BLANK-LINE'
+                
+            w_cnt = self.getWordCounter().add(altword)
             
-            word_unique_id = '{}.{}'.format(word, w_cnt)
+            word_unique_id = '{}.{}'.format(altword, w_cnt)
             
             item = {'pk': doc_id, 
                   'sk': word_unique_id, 
-                  'data':  sentence,
+                  'data':  altsentence,
                   'title': self.current_doc_name.replace('.txt','') 
                    } 
             
@@ -205,6 +218,7 @@ class DocumentProcess(DataProcessInterface):
         for word in self.spacifyPuncuation(paragraph.lower()).split():
             #print('word: ', word)
             word_id = word
+            
             # single word for all documents
             if word_id not in self.getDictionary()['words']:
                 self.getDictionary()['words'][word_id] = {'pk': word_id, 

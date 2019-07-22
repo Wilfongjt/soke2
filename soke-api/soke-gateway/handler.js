@@ -5,11 +5,14 @@ const docClient = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
  * Generated from write_handler_starter.sh
  * See serverless.yml for configuration
 */
-module.exports.documents_keywords = async (event) => {
+module.exports.index = async (event) => {
+  // return list of words with link to documents
   // need to remove duplicate words
   let keywords = event.queryStringParameters && event.queryStringParameters.keywords;
-  let param = {};
-  let data = [] ;
+  let vals = []; // list of keywords
+  // let param = {};
+  let param_list = [];
+  let data = [];
 
   let headers = {
       "Access-Control-Allow-Origin": "*",
@@ -17,19 +20,30 @@ module.exports.documents_keywords = async (event) => {
       "Access-Control-Allow-Methods": "OPTIONS,GET"
   };
 
-  if (keywords === undefined) {
+  if (keywords === undefined || keywords === null) {
     data = {
        "Items": []
      };
     return {
       statusCode: 200,
       headers: headers,
-      body: JSON.stringify({param, data}) };
+      body: JSON.stringify({param_list, data})
+    };
   }
-  let vals = keywords.split(" ");
-  let param_list = [];
-  let i = 0;
 
+  vals = keywords.split(" ");
+
+  if(vals.length === 0){
+    return {
+      statusCode: 200,
+      headers: headers,
+      body: JSON.stringify({ param_list, data }) };
+  }
+
+  let i = 0;
+  /*
+   prepare a search for each word
+  */
   for(i = 0; i < vals.length; i++){
     let skv = "%w.1".replace("%w",vals[i]);
 
@@ -43,38 +57,36 @@ module.exports.documents_keywords = async (event) => {
     });
   }
 
-  if(vals.length === 0){
-    return {
-      statusCode: 200,
-      headers: headers,
-      body: JSON.stringify({ param_list, data }) };
-  }
-
-  // load array with promises
-  // pass arry to Promise.all()
+  // run all the searches
+  const plst = [];
 
   try {
-    const plst = [];
-
     for(i=0; i < param_list.length; i++){
       plst.push(docClient.query(param_list[i]).promise());
     }
+  } catch(error){
+    return {statusCode: 400, body: error};
+  }
 
+  // wait for the searches to end
+  try {
     const results = await Promise.all(plst);
 
     return {
       statusCode: 200,
       headers: headers,
-      body: JSON.stringify({results}) };
-
+      body: JSON.stringify({results}),
+      isBase64Encoded: false
+    };
   } catch(error){
     return {statusCode: 400, body: error};
   }
+
 };
 
-module.exports.document_pk = async (event) => {
+module.exports.document = async (event) => {
   /*
-  returns all items for a document 
+  returns all items for a document by pk
   */
   let msg = 'document';
   let pk = event.pathParameters && event.pathParameters.pk;
