@@ -7,7 +7,7 @@ from util import Util
 class StubDB:
     def __init__(self,\
                  db_name='dynamodb',\
-                 region_name='us-east-2',\
+                 region_name='us-east-1',\
                  endpoint_url='http://localhost:8000/',\
                  aws_access_key_id='anything',\
                  aws_secret_access_key='anything'):
@@ -162,7 +162,8 @@ class StubDB:
                 # load the data
                 if self.dryrun:
                     print('Dryrun is ON: ',source_file)
-                else:    
+                else:
+                    print('load: ', source_file)
                     self.client.batch_write_item(RequestItems=data)
                 
                 i += 1

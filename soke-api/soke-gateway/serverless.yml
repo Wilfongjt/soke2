@@ -1,68 +1,91 @@
-# Welcome to Serverless!
-# Generated from write_serverless_starter.sh
-#
-# This file is the main config file for your service.
-# It's very minimal at this point and uses default values.
-# You can always add more config options for more control.
-# We've included some commented out config examples here.
-# Just uncomment any of them to get that config option.
-#
-# For full config options, check the docs:
-#    docs.serverless.com
-#
-# Happy Coding!
 service: soke-gateway # NOTE: update this with your service name
-# You can pin your service to only deploy with a specific Serverless version
-# Check out our docs for more details
-# frameworkVersion: "=X.X.X"
-
-# change stage to dev, test, or prod
 
 provider:
+  # starter
   name: aws
   runtime: nodejs10.x
-  region: us-east-2
-  stage: dev
-  versionFunctions: true
-  profile: ${self:provider.stage}Profile
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+  profile: ${self:custom.profiles.${self:provider.stage}}
+  ##
+  #basePath: ${opt:base, 'soke'}
+  apiKeys: # apikey
+    - serverless-${self:custom.customDomain.basePath}-${self:provider.stage}-apikey
+  ##  - serverless-${self:provider.basePath}-${self:provider.stage}-apikey
   iamRoleStatements:
-    $ref: ./iamRolesStatements.json
+    - Effect: "Allow"
+      Action:
+        - "lambda:InvokeFunction"
+      Resource: "*"
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:*"
+      Resource: "*"
+    - Effect: "Allow"
+      Action:
+        - "s3:*"
+      Resource: "*"
+
   environment:
+    SERVICE_NAME: ${self:service}
     TABLE_NAME: documents_${self:provider.stage}
     STAGE_NAME: ${self:provider.stage}
 
 functions:
 
-  # keywords:
-  #  handler: handler.keywords
+  # index:
+  #  handler: handler.index
   #  description: "documents keyword index to documents."
   #  events:
   #    - http:
   #        method: get
   #        path: keywords
   # search for list of keywords
-  # /documents/keywords?keywords=a the to
+  # /keywords?keywords=a the to
 
-  documents_keywords:
-    handler: handler.documents_keywords
-    description: "documents keyword index to documents."
+  index:
+    handler: handler.index
+    description: "returns index to documents for given words."
     events:
       - http:
           method: get
-          path: documents/keywords
+          path: index
+          cors: true
+          private: true # apikey
   # get items that make up a document
   # document/{pk}
-  document_pk:
-    handler: handler.document_pk
+  document:
+    handler: handler.document
     description: "get a single document using a key value"
     events:
       - http:
           method: get
           path: document/{pk}
+          cors: true
+          private: true # apikey
+
+plugins:
+  - serverless-domain-manager
 
 custom:
-    defaultStage: dev
+    # defaultStage: dev
+    #stage: ${opt:stage, 'dev'}
+
     profiles:
       dev: devProfile
       test: testProfile
       prod: prodProfile
+
+    domains:
+      dev: dev-api.lyttlebit.com
+      prod: api.lyttlebit.com
+      test: test-api.lyttlebit.com
+
+    customDomain:
+      basePath: 'soke' # This will be prefixed to all routes
+      endpointType: 'edge'
+      # lookup domain based on stage
+
+      domainName: "${self:custom.domains.${self:provider.stage}}" # Change this to your domain.
+      certificateName: "${self:custom.domains.${self:provider.stage}}"
+      createRoute53Record: true
