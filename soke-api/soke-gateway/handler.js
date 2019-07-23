@@ -21,13 +21,11 @@ module.exports.index = async (event) => {
   };
 
   if (keywords === undefined || keywords === null) {
-    data = {
-       "Items": []
-     };
+
     return {
       statusCode: 200,
       headers: headers,
-      body: JSON.stringify({param_list, data})
+      body: JSON.stringify({})
     };
   }
 

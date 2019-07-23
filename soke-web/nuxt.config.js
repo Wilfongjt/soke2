@@ -11,12 +11,14 @@ const routerBase = process.env.DEPLOY_ENV === 'GH_PAGES' ? {
 export default {
   ...routerBase,
   mode: 'universal',
-
+  /*
+    if INDEX is undefined then ...
+  */
   env: {
-    DEVSITE: process.env.DEVSITE,
-    AWSSOKE:process.env.AWSSOKE
+    DEVSITE: process.env.DEVSITE || 'DEV',
+    INDEX: process.env.INDEX || 'https://dev-api.lyttlebit.com/soke/index',
+    APIKEY: process.env.APIKEY || 'need-key-from-aws'
   },
-
   /*
   ** Headers of the page
   */
