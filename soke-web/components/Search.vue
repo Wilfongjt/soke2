@@ -81,7 +81,7 @@ export default {
         .replace('%s', process.env.INDEX)
         .replace('%p', this.awsGatewayParameters)
     }
-
+  },
   methods: {
     log: function (msg) {
       /* eslint-disable no-console */
