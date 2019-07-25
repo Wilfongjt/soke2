@@ -42,7 +42,10 @@ For detailed explanation on how things work, checkout [Nuxt.js docs](https://nux
 ## DEV Environment Variables
 * Replace <aws-host-name> with your amazon host name from your gateway.
 ```
-AWSSOKE={"get":"https://<aws-host-name>.execute-api.us-east-2.amazonaws.com/dev/documents/keywords"}
+deprecated AWS SOKE={"get":"https://<aws-host-name>.execute-api.us-east-2.amazonaws.com/dev/documents/keywords"}
+
+INDEX=https://dev-api.lyttlebit.com/index
+APIKEY=<aws-api-key>
 ```
 
 ## Docker-Compose

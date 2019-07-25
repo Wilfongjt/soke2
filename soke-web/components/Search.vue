@@ -25,15 +25,15 @@
       </p>
     </form>
     <!--ul id="search-results"-->
-      <div v-for="item in page.items" :key="item.id">
-        <span>&nbsp;</span>
-        <p class="subtitle">
-          {{ item.title }}
-        </p>
-        <p>
-          <span v-html="item.description"></span>
-        </p>
-      </div>
+    <div v-for="item in page.items" :key="item.id">
+      <span>&nbsp;</span>
+      <p class="subtitle">
+        {{ item.title }}
+      </p>
+      <p>
+        <span v-html="item.description" />
+      </p>
+    </div>
     <!--/ul-->
   </div>
 </template>
@@ -64,22 +64,22 @@ export default {
     awsHandlers: function () {
       return new AWSHandlers(this)
     },
+    awsHeader: function () {
+      return {
+        'x-api-key': process.env.APIKEY
+      }
+    },
     awsGatewayParameters: function () {
       return 'keywords=%s'.replace('%s', this.form.words)
     },
-    awsGateway: function () {
-      /*
-      * Returns JSON object holding URLs for webservice {get: "", post: "", ...}
-      */
-      let val = {}
-      try {
-        // get the gateway url
-        val = JSON.parse(process.env.AWSSOKE)
-      } catch (err) {
-        this.log('awsGateway error: ' + err)
-        val = {}
+    awsSearchURL: function () {
+      // no keywords
+      if (this.form.words === null || this.form.words === undefined || this.form.words.length === 0) {
+        return process.env.INDEX
       }
-      return val
+      return '%s?%p'
+        .replace('%s', process.env.INDEX)
+        .replace('%p', this.awsGatewayParameters)
     }
   },
   methods: {
@@ -106,24 +106,24 @@ export default {
       return desc
     },
     onSubmit: function () { // submit button
-      // put together url to get items
-      const awsGatewayURLWithParameters = '%s?%p'
-        .replace('%s', this.awsGateway.get)
-        .replace('%p', this.awsGatewayParameters)
       // clear the list
       this.page.items = []
       // make the call
-      this.awsHandlers.awsGET(awsGatewayURLWithParameters)
+      this.awsHandlers.awsGET(this.awsSearchURL, this.awsHeader)
         .then((response) => {
           if (response.status === 200) {
             let i = 0
-            for (i = 0; i < response.data.results.length; i++) {
-              this.addItems(response.data.results[i].Items)
+            // check for results field
+            if (response.data.hasOwnProperty('results')) {
+              for (i = 0; i < response.data.results.length; i++) {
+                this.addItems(response.data.results[i].Items)
+              }
+            } else {
+              this.log('no results for (%s)'.replace('%s', this.form.words))
             }
             this.feedBack('Type another!')
           } else {
             this.feedBack('Something unexpected happened!')
-            // this.addItem('something unexpected happened!')
           }
         })
         .catch((err) => {

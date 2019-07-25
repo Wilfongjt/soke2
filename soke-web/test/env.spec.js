@@ -7,12 +7,16 @@ describe('.Env', () => {
 
     expect(process.env.DEVSITE).not.toBe(undefined)
   })
+  test('is aws INDEX initialied', () => {
 
+    expect(process.env.INDEX).not.toBe(undefined)
+  })
+  /*
   test('is awsGateway initialied', () => {
 
     expect(process.env.awsGateway).not.toBe(undefined)
   })
-
+  */
 
   test('is NODE_ENV initialied', () => {
 

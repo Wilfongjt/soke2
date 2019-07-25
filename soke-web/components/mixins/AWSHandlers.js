@@ -8,8 +8,8 @@ class AWSHandlers {
     this.component = component
   }
 
-  async awsGET(awsGatewayURLWithParameters) {
-    const response = await this.component.$axios(awsGatewayURLWithParameters)
+  async awsGET(awsGatewayURLWithParameters, awsHeader) {
+    const response = await this.component.$axios(awsGatewayURLWithParameters, { headers: awsHeader })
     return response
   }
 }
