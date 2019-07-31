@@ -19,21 +19,32 @@ module.exports.index = async (event) => {
       "Access-Control-Allow-Headers": "Content-Type,Accept-Langauge",
       "Access-Control-Allow-Methods": "OPTIONS,GET"
   };
-
-  if (keywords === undefined || keywords === null) {
+  // keyword not sent
+  if (keywords === undefined
+    || keywords === null
+  ) {
 
     return {
-      statusCode: 200,
+      statusCode: 403, // forbidden
       headers: headers,
       body: JSON.stringify({})
     };
   }
+  // keyword is empty
+  if (keywords.length === 0) {
 
+    return {
+      statusCode: 400, // bad format
+      headers: headers,
+      body: JSON.stringify({})
+    };
+  }
+  // handle multiple keywords
   vals = keywords.split(" ");
 
   if(vals.length === 0){
     return {
-      statusCode: 200,
+      statusCode: 400,
       headers: headers,
       body: JSON.stringify({ param_list, data }) };
   }
@@ -44,18 +55,19 @@ module.exports.index = async (event) => {
   */
   for(i = 0; i < vals.length; i++){
     let skv = "%w.1".replace("%w",vals[i]);
-
+    // let gsi_1 = "gsi_1_"
     param_list.push({
       TableName: process.env.TABLE_NAME,
-      IndexName: "gsi_1",
+      IndexName: process.env.GSI_1,
       KeyConditionExpression: "sk = :sk1",
       ExpressionAttributeValues: {
        ":sk1": skv
       }
     });
   }
-
-  // run all the searches
+  /*
+  run all the searches
+  */
   const plst = [];
 
   try {
